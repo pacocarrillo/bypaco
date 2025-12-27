@@ -133,7 +133,7 @@ export default function App() {
             <div className="flex justify-between">
               {/* INSTAGRAM (Tu nueva cuenta) */}
               <a 
-                href="https://instagram.com/TU_USUARIO_INSTAGRAM" 
+                href="https://instagram.com/bypaco.es" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-white/5 hover:bg-pink-500/20 hover:text-pink-500 transition-colors"
