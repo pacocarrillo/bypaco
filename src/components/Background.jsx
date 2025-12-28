@@ -1,36 +1,36 @@
-/* MODIFICACIÓN: 28-12-2025
-   CAMBIO: Tamaño dinámico por dispositivo y aceleración GPU.
-*/
 import { motion } from "framer-motion";
 
 const Background = () => {
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden bg-[#050505]">
-      {/* Luz Azul: Rápida y fluida */}
+    <div className="fixed inset-0 z-[-1] overflow-hidden bg-dark">
+      <div className="absolute inset-0 opacity-20 mix-blend-soft-light pointer-events-none">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+        </svg>
+      </div>
+
+      {/* Luz Azul */}
       <motion.div
-        animate={{ 
-          x: [0, 200, -150, 0], 
-          y: [0, -150, 200, 0],
-          scale: [1, 1.2, 0.9, 1] 
-        }}
-        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-        style={{ willChange: "transform" }}
-        className="absolute top-[-10%] left-[-10%] 
-                   w-[300px] h-[300px] md:w-[600px] md:h-[600px] 
-                   bg-blue-600 rounded-full mix-blend-screen filter blur-[80px] md:blur-[120px] opacity-40"
+        animate={{ x: [0, 100, 0], y: [0, -50, 0], scale: [1, 1.2, 1] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-liquid-blue rounded-full mix-blend-screen filter blur-[100px] opacity-40"
       />
 
-      {/* Luz Púrpura: Movimiento amplio */}
+      {/* Luz Púrpura */}
       <motion.div
-        animate={{ 
-          x: [0, -250, 150, 0], 
-          y: [0, 200, -150, 0]
-        }}
-        transition={{ duration: 9, repeat: Infinity, ease: "linear", delay: 1 }}
-        style={{ willChange: "transform" }}
-        className="absolute top-[20%] right-[-10%] 
-                   w-[350px] h-[350px] md:w-[700px] md:h-[700px] 
-                   bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] md:blur-[150px] opacity-30"
+        animate={{ x: [0, -100, 0], y: [0, 100, 0], scale: [1, 1.5, 1] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-liquid-purple rounded-full mix-blend-screen filter blur-[120px] opacity-30"
+      />
+
+      {/* Luz Cian */}
+      <motion.div
+        animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+        className="absolute bottom-[-10%] left-[20%] w-[400px] h-[400px] bg-liquid-cyan rounded-full mix-blend-screen filter blur-[100px] opacity-20"
       />
     </div>
   );
