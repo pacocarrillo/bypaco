@@ -1,12 +1,12 @@
 /* MODIFICACIÓN: 28-12-2025
   AUTOR: ByPaco.es
-  CAMBIOS: Restauración del puntero original del sistema para mayor fluidez y comodidad.
+  CAMBIOS: Eliminación de redundancia en disponibilidad, mensaje de marca enfocado a calidad y puntero optimizado.
 */
 
 import Background from "./components/Background";
 import Card from "./components/Card";
 import Tag from "./components/Tag";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useEffect } from "react";
 import { 
   Github, Mail, Instagram,
@@ -19,32 +19,36 @@ export default function App() {
     whileHover: { y: -5, transition: { duration: 0.3, ease: "easeOut" } }
   };
 
-  useEffect(() => {
-    // 1. Forzamos que el body y html recuperen el cursor por defecto
-    document.documentElement.style.cursor = 'auto';
-    document.body.style.cursor = 'auto';
+  // Puntero personalizado
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  const springConfig = { damping: 25, stiffness: 700 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
 
-    // 2. Eliminamos cualquier estilo inyectado previamente que oculte el cursor
-    const styles = document.querySelectorAll('style');
-    styles.forEach(s => {
-      if (s.innerHTML.includes('cursor: none')) {
-        s.remove();
-      }
-    });
+  useEffect(() => {
+    const moveCursor = (e) => {
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
+    };
+    window.addEventListener("mousemove", moveCursor);
+    return () => window.removeEventListener("mousemove", moveCursor);
   }, []);
 
   return (
-    <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30">
+    <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30 cursor-none">
       <Background />
       
+      {/* PUNTERO CIAN */}
+      <motion.div 
+        className="fixed top-0 left-0 w-4 h-4 bg-cyan-500 rounded-full pointer-events-none z-[9999] mix-blend-screen shadow-[0_0_15px_rgba(6,182,212,0.8)]"
+        style={{ x: cursorXSpring, y: cursorYSpring, translateX: "-50%", translateY: "-50%" }}
+      />
+
       <main className="relative z-10 max-w-6xl mx-auto p-4 md:p-8 pt-10 md:pt-20 pb-20">
         
         <header className="mb-8 md:mb-12">
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-bold tracking-tighter"
-          >
+          <motion.h1 className="text-5xl md:text-7xl font-bold tracking-tighter">
             ByPaco<span className="text-cyan-500">.es</span>
           </motion.h1>
           <p className="text-lg md:text-xl text-gray-400 mt-2 font-light">
@@ -54,7 +58,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:auto-rows-[180px]">
           
-          {/* 1. INTRODUCCIÓN */}
+          {/* 1. INTRODUCCIÓN - Texto de marca mejorado */}
           <motion.div className="md:col-span-3 md:row-span-2" {...hoverAnimation}>
             <Card className="w-full h-full flex flex-col justify-between min-h-[250px] md:min-h-0 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10" />
@@ -83,12 +87,12 @@ export default function App() {
             </Card>
           </motion.div>
 
-          {/* 3. CONTACTO */}
+          {/* 3. LLAMADA A LA ACCIÓN - Único contacto */}
           <motion.div {...hoverAnimation}>
             <Card className="h-full flex flex-col justify-center gap-3 bg-cyan-500/10 border border-cyan-500/30 p-6 group cursor-pointer">
               <MessageSquare className="w-6 h-6 text-cyan-400" />
               <h3 className="font-bold text-sm text-white tracking-tight">¿Tienes una idea?</h3>
-              <a href="mailto:hola@bypaco.com" className="text-[10px] text-cyan-400 font-black uppercase tracking-widest flex items-center gap-2 group-hover:underline cursor-pointer">
+              <a href="mailto:hola@bypaco.com" className="text-[10px] text-cyan-400 font-black uppercase tracking-widest flex items-center gap-2 group-hover:underline">
                 Hablemos ahora <ArrowUpRight size={12}/>
               </a>
             </Card>
@@ -97,7 +101,7 @@ export default function App() {
           {/* 4. PROYECTO WEB - JARDINERÍA */}
           <motion.div className="md:col-span-2 md:row-span-3" {...hoverAnimation}>
             <Card className="w-full h-full group overflow-hidden border-0 relative bg-[#080808] flex flex-col items-center !p-0 min-h-[580px] md:min-h-0" noHover>
-              <a href="https://jardineriacarrillo.es" target="_blank" rel="noopener noreferrer" className="relative w-full h-full flex flex-col items-center justify-start pt-8 md:pt-12 cursor-pointer">
+              <a href="https://jardineriacarrillo.es" target="_blank" rel="noopener noreferrer" className="relative w-full h-full flex flex-col items-center justify-start pt-8 md:pt-12">
                 <div className="relative mx-auto border-gray-900 bg-gray-900 border-[8px] rounded-[3rem] h-[480px] w-[85%] max-w-[230px] shadow-[0_0_60px_rgba(0,0,0,0.6)] transition-all duration-700 group-hover:scale-[1.02] z-10 mb-32">
                   <div className="rounded-[2.5rem] overflow-hidden w-full h-full bg-black relative">
                     <video src="/jardineria-scroll.mov" autoPlay loop muted playsInline className="w-full h-full object-cover opacity-95" />
@@ -107,10 +111,10 @@ export default function App() {
                   <div className="flex flex-wrap items-end justify-between gap-4">
                     <div className="flex-1 min-w-[180px]">
                       <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400">Trabajo Realizado</span>
-                      <h3 className="text-2xl md:text-4xl font-bold text-white tracking-tighter leading-[0.9] mb-2 text-pretty">Web de alta<br/>calidad visual.</h3>
+                      <h3 className="text-2xl md:text-4xl font-bold text-white tracking-tighter leading-[0.9] mb-2">Web de alta<br/>calidad visual.</h3>
                     </div>
                     <div className="flex-shrink-0">
-                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600/20 backdrop-blur-md border border-blue-500/30 rounded-full shadow-lg group-hover:bg-blue-600/40 transition-all cursor-pointer">
+                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600/20 backdrop-blur-md border border-blue-500/30 rounded-full shadow-lg group-hover:bg-blue-600/40 transition-all">
                         <span className="text-[10px] font-black text-white uppercase tracking-widest">Ver Web</span>
                         <ArrowUpRight size={16} className="text-white" />
                       </div>
@@ -135,7 +139,7 @@ export default function App() {
                   ))}
                 </ul>
               </div>
-              <button className="w-full py-3 mt-6 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all text-[10px] font-black uppercase tracking-widest text-cyan-400 cursor-pointer">
+              <button className="w-full py-3 mt-6 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all text-[10px] font-black uppercase tracking-widest text-cyan-400">
                 Saber más
               </button>
             </Card>
@@ -146,48 +150,86 @@ export default function App() {
             <Card className="h-full flex flex-col justify-center gap-3 bg-white/[0.02] backdrop-blur-md border border-white/5 p-6">
               <Monitor className="w-6 h-6 text-green-400" />
               <h3 className="font-bold text-sm text-white tracking-tight">Puesta en marcha</h3>
-              <p className="text-[10px] text-gray-500 font-medium leading-tight text-pretty">
+              <p className="text-[10px] text-gray-500 font-medium leading-tight">
                 Me ocupo de la gestión del servidor, el dominio y que todo esté online sin errores.
               </p>
             </Card>
           </motion.div>
 
-          {/* 7. SHOWREEL - KOIN */}
-          <motion.div className="md:col-span-2 md:row-span-3" {...hoverAnimation}>
-            <Card className="w-full h-full group overflow-hidden border-0 relative bg-[#050505] flex items-center justify-center !p-0 min-h-[580px] md:min-h-0" noHover>
-              <div className="absolute inset-0 z-0 overflow-hidden">
-                <motion.img src="/koin-1.jpg" animate={{ y: [0, -15, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-10 -right-10 w-64 rounded-3xl opacity-40 blur-[1px]" />
-                <motion.img src="/koin-2.jpg" animate={{ y: [0, 15, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute -bottom-20 -left-10 w-60 rounded-3xl opacity-40 blur-[1px]" />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/80 to-[#050505]" />
-              </div>
-              <div className="absolute top-6 right-6 z-30">
-                <div className="flex items-center gap-2.5 px-3.5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full cursor-pointer hover:bg-cyan-500/20 transition-all">
-                  <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center"><Play size={10} className="text-black fill-current ml-0.5" /></div>
-                  <span className="text-[9px] font-black text-white uppercase tracking-widest">Vídeo</span>
-                </div>
-              </div>
-              <div className="relative z-10 flex flex-col items-center gap-8 w-full px-4 text-center">
-                <div className="absolute inset-0 bg-cyan-500/10 blur-[80px] rounded-full animate-pulse -z-10" />
-                <motion.div whileHover={{ scale: 1.05 }} className="relative w-32 h-32 md:w-36 md:h-36 p-1 bg-gradient-to-br from-cyan-500/30 to-transparent rounded-[2.2rem] shadow-2xl overflow-hidden">
-                  <img src="/koin-icon.jpg" className="w-full h-full object-cover rounded-[2rem]" alt="Koin Icon" />
-                </motion.div>
-                <div className="w-full px-4">
-                  <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tighter uppercase mb-4 text-pretty">Koin <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">App</span></h3>
-                  <div className="flex items-center justify-center gap-3 w-full">
-                    <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
-                    <p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-[0.2em] whitespace-nowrap">App Nativa iOS</p>
-                    <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
-                  </div>
-                </div>
-              </div>
-              <div className="absolute bottom-0 inset-x-0 z-20 p-8 bg-black/60 backdrop-blur-xl border-t border-white/5">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                  <p className="text-xs md:text-sm text-gray-400 font-medium text-center md:text-left max-w-xs leading-relaxed italic">Un ejemplo real de cómo diseño y programo aplicaciones financieras para iPhone.</p>
-                  <div className="flex items-center gap-3 px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-full"><span className="text-cyan-400 font-black text-[9px] uppercase tracking-[0.2em]">Cian Neon</span><div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" /></div>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
+          {/* 7. SHOWREEL - KOIN APP (Diseño Balanceado) */}
+<Card className="md:col-span-2 md:row-span-3 group overflow-hidden border-0 relative bg-[#050505] flex items-center justify-center !p-0 min-h-[580px] md:min-h-0" noHover>
+  
+  {/* CAPA DE FONDO */}
+  <div className="absolute inset-0 z-0 overflow-hidden">
+    <motion.img 
+      src="/koin-1.jpg"
+      animate={{ y: [0, -15, 0] }}
+      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute -top-10 -right-10 w-64 rounded-3xl opacity-40 blur-[1px]" 
+    />
+    <motion.img 
+      src="/koin-2.jpg"
+      animate={{ y: [0, 15, 0] }}
+      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      className="absolute -bottom-20 -left-10 w-60 rounded-3xl opacity-40 blur-[1px]"
+    />
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/80 to-[#050505]" />
+  </div>
+
+  {/* BOTÓN "PÍLDORA" SHOWREEL */}
+  <div className="absolute top-6 right-6 z-30">
+    <div className="flex items-center gap-2.5 px-3.5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full cursor-pointer hover:bg-cyan-500/20 transition-all">
+      <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center">
+        <Play size={10} className="text-black fill-current ml-0.5" />
+      </div>
+      <span className="text-[9px] font-black text-white uppercase tracking-widest">Showreel</span>
+    </div>
+  </div>
+
+  {/* CONTENIDO CENTRAL */}
+  <div className="relative z-10 flex flex-col items-center gap-8 w-full px-4">
+    <div className="relative">
+      <div className="absolute inset-0 bg-cyan-500/10 blur-[80px] rounded-full animate-pulse" />
+      <motion.div 
+        whileHover={{ y: -5 }}
+        className="relative w-32 h-32 md:w-36 md:h-36 p-1 bg-gradient-to-br from-cyan-500/30 to-transparent rounded-[2.2rem] shadow-2xl overflow-hidden"
+      >
+        <img 
+          src="/koin-icon.jpg" 
+          className="w-full h-full object-cover rounded-[2rem]" 
+          alt="Koin Icon"
+        />
+      </motion.div>
+    </div>
+
+    <div className="text-center w-full">
+      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 block mb-2">iOS Showcase</span>
+      <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tighter uppercase mb-4">Koin <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">App</span></h3>
+      
+      {/* Lema optimizado: tracking ligeramente menor para asegurar que quepa sin cortes */}
+      <div className="flex items-center justify-center gap-3 w-full">
+         <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
+         <p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-[0.2em] whitespace-nowrap">
+            Personal Finance Nativa
+         </p>
+         <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
+      </div>
+    </div>
+  </div>
+
+  {/* PIE DE TARJETA - Recuperamos el tamaño p-8 y texto descriptivo */}
+  <div className="absolute bottom-0 inset-x-0 z-20 p-8 bg-black/60 backdrop-blur-xl border-t border-white/5">
+    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+      <p className="text-xs md:text-sm text-gray-400 font-medium text-center md:text-left max-w-xs leading-relaxed">
+        Arquitectura nativa en Swift diseñada para ofrecer el control total de tus finanzas con la simplicidad de iOS.
+      </p>
+      <div className="flex items-center gap-3 px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-full">
+        <span className="text-cyan-400 font-black text-[9px] uppercase tracking-[0.2em]">Build 2025</span>
+        <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+      </div>
+    </div>
+  </div>
+</Card>
 
           {/* 8. REDES SOCIALES */}
           <motion.div {...hoverAnimation}>
@@ -197,7 +239,7 @@ export default function App() {
                   { icon: <Mail size={20}/>, label: "Email", color: "hover:text-cyan-400", url: "mailto:hola@bypaco.com" },
                   { icon: <Github size={20}/>, label: "GitHub", color: "hover:text-white", url: "https://github.com/pacocarrillo" }
                 ].map((social, i) => (
-                  <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 text-gray-400 ${social.color} transition-all hover:scale-110 cursor-pointer`}>
+                  <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 text-gray-400 ${social.color} transition-all hover:scale-110`}>
                     {social.icon}
                     <span className="hidden md:block text-[10px] font-black uppercase tracking-widest">{social.label}</span>
                   </a>
