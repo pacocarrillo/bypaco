@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Esto ayuda a que las rutas no se rompan
+  base: './',
   build: {
-    outDir: './', // <--- ¡ESTO ES LA CLAVE! Dice: "Pon los archivos en la raíz"
+    outDir: './',
+    emptyOutDir: false, // Importante para no borrar tu código fuente al compilar
   }
 })
