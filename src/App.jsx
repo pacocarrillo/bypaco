@@ -7,6 +7,7 @@ import Background from "./components/Background";
 import Card from "./components/Card";
 import Tag from "./components/Tag";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { 
   Github, Mail, Instagram,
   Globe, Play, Layers, ArrowUpRight, 
@@ -17,6 +18,20 @@ export default function App() {
   const hoverAnimation = {
     whileHover: { y: -5, transition: { duration: 0.3, ease: "easeOut" } }
   };
+
+  useEffect(() => {
+    // 1. Forzamos que el body y html recuperen el cursor por defecto
+    document.documentElement.style.cursor = 'auto';
+    document.body.style.cursor = 'auto';
+
+    // 2. Eliminamos cualquier estilo inyectado previamente que oculte el cursor
+    const styles = document.querySelectorAll('style');
+    styles.forEach(s => {
+      if (s.innerHTML.includes('cursor: none')) {
+        s.remove();
+      }
+    });
+  }, []);
 
   return (
     <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30">
