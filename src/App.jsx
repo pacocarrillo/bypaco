@@ -1,13 +1,12 @@
 /* MODIFICACIÓN: 28-12-2025
   AUTOR: ByPaco.es
-  CAMBIOS: Puntero inteligente que reacciona a botones/enlaces y eliminación de cursor nativo.
+  CAMBIOS: Restauración del puntero original del sistema para mayor fluidez y comodidad.
 */
 
 import Background from "./components/Background";
 import Card from "./components/Card";
 import Tag from "./components/Tag";
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { 
   Github, Mail, Instagram,
   Globe, Play, Layers, ArrowUpRight, 
@@ -15,68 +14,22 @@ import {
 } from "lucide-react"; 
 
 export default function App() {
-  const [isHovering, setIsHovering] = useState(false);
-
   const hoverAnimation = {
     whileHover: { y: -5, transition: { duration: 0.3, ease: "easeOut" } }
   };
-
-  // Lógica del puntero personalizado con suavizado
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 35, stiffness: 400, mass: 0.5 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
-
-  useEffect(() => {
-    // 1. Forzamos la desaparición del cursor nativo en toda la web
-    const style = document.createElement('style');
-    style.innerHTML = `* { cursor: none !important; }`;
-    document.head.appendChild(style);
-
-    const moveCursor = (e) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
-
-      // 2. Detección de elementos clicables para reaccionar
-      const target = e.target;
-      const isClickable = target.closest('a') || 
-                         target.closest('button') || 
-                         window.getComputedStyle(target).cursor === 'pointer';
-      
-      setIsHovering(!!isClickable);
-    };
-
-    window.addEventListener("mousemove", moveCursor);
-    return () => {
-      window.removeEventListener("mousemove", moveCursor);
-      document.head.removeChild(style);
-    };
-  }, []);
 
   return (
     <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30">
       <Background />
       
-      {/* PUNTERO CIAN INTELIGENTE */}
-      <motion.div 
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] mix-blend-screen shadow-lg flex items-center justify-center"
-        animate={{
-          width: isHovering ? 50 : 16,
-          height: isHovering ? 50 : 16,
-          backgroundColor: isHovering ? "rgba(6, 182, 212, 0.15)" : "rgb(6, 182, 212)",
-          border: isHovering ? "1.5px solid rgba(6, 182, 212, 0.5)" : "none"
-        }}
-        style={{ x: cursorXSpring, y: cursorYSpring, translateX: "-50%", translateY: "-50%" }}
-      >
-        {/* Punto central de precisión cuando se expande */}
-        {isHovering && <div className="w-1 h-1 bg-white rounded-full" />}
-      </motion.div>
-
       <main className="relative z-10 max-w-6xl mx-auto p-4 md:p-8 pt-10 md:pt-20 pb-20">
         
         <header className="mb-8 md:mb-12">
-          <motion.h1 className="text-5xl md:text-7xl font-bold tracking-tighter">
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-7xl font-bold tracking-tighter"
+          >
             ByPaco<span className="text-cyan-500">.es</span>
           </motion.h1>
           <p className="text-lg md:text-xl text-gray-400 mt-2 font-light">
@@ -120,16 +73,16 @@ export default function App() {
             <Card className="h-full flex flex-col justify-center gap-3 bg-cyan-500/10 border border-cyan-500/30 p-6 group cursor-pointer">
               <MessageSquare className="w-6 h-6 text-cyan-400" />
               <h3 className="font-bold text-sm text-white tracking-tight">¿Tienes una idea?</h3>
-              <a href="mailto:hola@bypaco.com" className="text-[10px] text-cyan-400 font-black uppercase tracking-widest flex items-center gap-2 group-hover:underline">
+              <a href="mailto:hola@bypaco.com" className="text-[10px] text-cyan-400 font-black uppercase tracking-widest flex items-center gap-2 group-hover:underline cursor-pointer">
                 Hablemos ahora <ArrowUpRight size={12}/>
               </a>
             </Card>
           </motion.div>
 
-          {/* 4. PROYECTO WEB */}
+          {/* 4. PROYECTO WEB - JARDINERÍA */}
           <motion.div className="md:col-span-2 md:row-span-3" {...hoverAnimation}>
             <Card className="w-full h-full group overflow-hidden border-0 relative bg-[#080808] flex flex-col items-center !p-0 min-h-[580px] md:min-h-0" noHover>
-              <a href="https://jardineriacarrillo.es" target="_blank" rel="noopener noreferrer" className="relative w-full h-full flex flex-col items-center justify-start pt-8 md:pt-12">
+              <a href="https://jardineriacarrillo.es" target="_blank" rel="noopener noreferrer" className="relative w-full h-full flex flex-col items-center justify-start pt-8 md:pt-12 cursor-pointer">
                 <div className="relative mx-auto border-gray-900 bg-gray-900 border-[8px] rounded-[3rem] h-[480px] w-[85%] max-w-[230px] shadow-[0_0_60px_rgba(0,0,0,0.6)] transition-all duration-700 group-hover:scale-[1.02] z-10 mb-32">
                   <div className="rounded-[2.5rem] overflow-hidden w-full h-full bg-black relative">
                     <video src="/jardineria-scroll.mov" autoPlay loop muted playsInline className="w-full h-full object-cover opacity-95" />
@@ -139,10 +92,10 @@ export default function App() {
                   <div className="flex flex-wrap items-end justify-between gap-4">
                     <div className="flex-1 min-w-[180px]">
                       <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400">Trabajo Realizado</span>
-                      <h3 className="text-2xl md:text-4xl font-bold text-white tracking-tighter leading-[0.9] mb-2">Web de alta<br/>calidad visual.</h3>
+                      <h3 className="text-2xl md:text-4xl font-bold text-white tracking-tighter leading-[0.9] mb-2 text-pretty">Web de alta<br/>calidad visual.</h3>
                     </div>
                     <div className="flex-shrink-0">
-                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600/20 backdrop-blur-md border border-blue-500/30 rounded-full shadow-lg transition-all group-hover:bg-blue-600/40">
+                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600/20 backdrop-blur-md border border-blue-500/30 rounded-full shadow-lg group-hover:bg-blue-600/40 transition-all cursor-pointer">
                         <span className="text-[10px] font-black text-white uppercase tracking-widest">Ver Web</span>
                         <ArrowUpRight size={16} className="text-white" />
                       </div>
@@ -167,7 +120,7 @@ export default function App() {
                   ))}
                 </ul>
               </div>
-              <button className="w-full py-3 mt-6 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all text-[10px] font-black uppercase tracking-widest text-cyan-400">
+              <button className="w-full py-3 mt-6 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all text-[10px] font-black uppercase tracking-widest text-cyan-400 cursor-pointer">
                 Saber más
               </button>
             </Card>
@@ -178,7 +131,7 @@ export default function App() {
             <Card className="h-full flex flex-col justify-center gap-3 bg-white/[0.02] backdrop-blur-md border border-white/5 p-6">
               <Monitor className="w-6 h-6 text-green-400" />
               <h3 className="font-bold text-sm text-white tracking-tight">Puesta en marcha</h3>
-              <p className="text-[10px] text-gray-500 font-medium leading-tight">
+              <p className="text-[10px] text-gray-500 font-medium leading-tight text-pretty">
                 Me ocupo de la gestión del servidor, el dominio y que todo esté online sin errores.
               </p>
             </Card>
@@ -229,7 +182,7 @@ export default function App() {
                   { icon: <Mail size={20}/>, label: "Email", color: "hover:text-cyan-400", url: "mailto:hola@bypaco.com" },
                   { icon: <Github size={20}/>, label: "GitHub", color: "hover:text-white", url: "https://github.com/pacocarrillo" }
                 ].map((social, i) => (
-                  <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 text-gray-400 ${social.color} transition-all hover:scale-110`}>
+                  <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 text-gray-400 ${social.color} transition-all hover:scale-110 cursor-pointer`}>
                     {social.icon}
                     <span className="hidden md:block text-[10px] font-black uppercase tracking-widest">{social.label}</span>
                   </a>
