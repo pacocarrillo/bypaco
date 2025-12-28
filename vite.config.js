@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   base: './',
   build: {
-    outDir: 'dist', // Cocinamos en una carpeta segura llamada 'dist'
+    outDir: 'dist', // Cocinamos en una carpeta limpia
     emptyOutDir: true,
   }
 })
