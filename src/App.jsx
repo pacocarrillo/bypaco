@@ -1,172 +1,213 @@
 /* MODIFICACIÓN: 28-12-2025
-  AUTOR: ByPaco
-  CAMBIOS: Optimización responsive para móvil (Bento Grid fluido) y personalización de textos.
+  AUTOR: ByPaco.es
+  CAMBIOS: Eliminación de redundancia en disponibilidad, mensaje de marca enfocado a calidad y puntero optimizado.
 */
 
 import Background from "./components/Background";
 import Card from "./components/Card";
 import Tag from "./components/Tag";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect } from "react";
 import { 
   Github, Mail, Instagram,
-  Globe, Play, Layers, ArrowUpRight 
+  Globe, Play, Layers, ArrowUpRight, 
+  Code2, Zap, MessageSquare, Monitor
 } from "lucide-react"; 
 
 export default function App() {
+  const hoverAnimation = {
+    whileHover: { y: -5, transition: { duration: 0.3, ease: "easeOut" } }
+  };
+
+  // Puntero personalizado
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  const springConfig = { damping: 25, stiffness: 700 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  useEffect(() => {
+    const moveCursor = (e) => {
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
+    };
+    window.addEventListener("mousemove", moveCursor);
+    return () => window.removeEventListener("mousemove", moveCursor);
+  }, []);
+
   return (
-    <div className="relative min-h-screen text-white font-sans selection:bg-liquid-blue selection:text-black">
+    <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30 cursor-none">
       <Background />
       
+      {/* PUNTERO CIAN */}
+      <motion.div 
+        className="fixed top-0 left-0 w-4 h-4 bg-cyan-500 rounded-full pointer-events-none z-[9999] mix-blend-screen shadow-[0_0_15px_rgba(6,182,212,0.8)]"
+        style={{ x: cursorXSpring, y: cursorYSpring, translateX: "-50%", translateY: "-50%" }}
+      />
+
       <main className="relative z-10 max-w-6xl mx-auto p-4 md:p-8 pt-10 md:pt-20 pb-20">
         
-        {/* ENCABEZADO - Más compacto en móvil */}
         <header className="mb-8 md:mb-12">
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-bold tracking-tighter"
-          >
-            ByPaco<span className="text-liquid-blue">.</span>
+          <motion.h1 className="text-5xl md:text-7xl font-bold tracking-tighter">
+            ByPaco<span className="text-cyan-500">.es</span>
           </motion.h1>
           <p className="text-lg md:text-xl text-gray-400 mt-2 font-light">
-            Creative Developer & iOS Enthusiast
+            Desarrollador de Apps y Soluciones Web
           </p>
         </header>
 
-        {/* --- GRID MAESTRO --- 
-            Móvil: 1 columna, altura automática.
-            Escritorio: 4 columnas, filas de 180px.
-        */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:auto-rows-[180px]">
           
-          {/* 1. INTRODUCCIÓN - Ocupa más espacio para destacar */}
-          <Card className="md:col-span-3 md:row-span-2 flex flex-col justify-between min-h-[250px] md:min-h-0">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-                <span className="text-xs text-green-300 font-medium uppercase tracking-widest">Disponible para proyectos</span>
+          {/* 1. INTRODUCCIÓN - Texto de marca mejorado */}
+          <motion.div className="md:col-span-3 md:row-span-2" {...hoverAnimation}>
+            <Card className="w-full h-full flex flex-col justify-between min-h-[250px] md:min-h-0 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10" />
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[10px] text-cyan-400 font-black uppercase tracking-[0.3em]">Calidad sobre cantidad</span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-4 text-pretty">
+                  Ayudo a negocios a tener una <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">presencia digital</span> sólida y profesional.
+                </h2>
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-4">
-                Diseño y desarrollo <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">soluciones digitales</span> que marcan la diferencia.
-              </h2>
-            </div>
-            <p className="text-gray-400 text-base md:text-lg max-w-2xl">
-              Especializado en crear apps iOS nativas y experiencias web modernas que combinan potencia y elegancia.
-            </p>
-          </Card>
+              <p className="text-gray-400 text-base md:text-lg max-w-2xl">
+                Me encargo de todo el proceso: desde el diseño hasta que la web o la app está funcionando en internet.
+              </p>
+            </Card>
+          </motion.div>
 
-          {/* 2. STACK - En móvil es una tarjeta normal */}
-          <Card className="flex flex-col justify-center gap-4 bg-[#111]">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest text-center md:text-left">Tech Stack</h3>
-            <div className="flex flex-wrap justify-center md:justify-start gap-2">
-              <Tag text="SwiftUI" color="bg-orange-500/10 text-orange-400 border border-orange-500/20"/>
-              <Tag text="React" color="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"/>
-              <Tag text="Tailwind" color="bg-blue-500/10 text-blue-400 border border-blue-500/20"/>
-            </div>
-          </Card>
+          {/* 2. IA Y CONECTIVIDAD */}
+          <motion.div {...hoverAnimation}>
+            <Card className="h-full flex flex-col justify-center gap-3 bg-white/[0.02] backdrop-blur-md border border-white/5 p-6">
+              <Zap className="w-6 h-6 text-purple-400 fill-current" />
+              <h3 className="font-bold text-sm text-white tracking-tight">IA y Datos</h3>
+              <p className="text-[10px] text-gray-500 font-medium leading-tight">
+                Integro funciones inteligentes y conecto servicios para que tu app haga el trabajo por ti.
+              </p>
+            </Card>
+          </motion.div>
 
-          {/* 3. UBICACIÓN */}
-          <Card className="flex flex-col items-center justify-center bg-gradient-to-b from-white/5 to-transparent">
-            <div className="text-3xl mb-1">📍</div>
-            <h3 className="font-bold text-white">Barcelona</h3>
-            <p className="text-xs text-gray-500">España</p>
-          </Card>
-
-          {/* 4. PROYECTO DESTACADO - iOS App */}
-          <Card className="md:col-span-2 md:row-span-2 group cursor-pointer p-0 overflow-hidden border-0 min-h-[300px] md:min-h-0" noHover>
-             <img 
-               src="https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1974&auto=format&fit=crop" 
-               alt="App Project" 
-               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-50"
-             />
-             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"/>
-             
-             <div className="absolute bottom-0 left-0 p-6 w-full">
-               <div className="flex justify-between items-end">
-                 <div>
-                   <span className="px-2 py-1 bg-blue-500 text-[10px] font-bold uppercase rounded mb-2 inline-block">iOS Native</span>
-                   <h3 className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">Mi App iOS Real</h3>
-                   <p className="text-sm text-gray-300">Gestor inteligente diseñado para iPhone.</p>
-                 </div>
-                 <div className="p-3 bg-white text-black rounded-full transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
-                   <ArrowUpRight size={20} />
-                 </div>
-               </div>
-             </div>
-          </Card>
-
-          {/* 5. SERVICIOS - Vertical en escritorio */}
-          <Card className="md:row-span-2 flex flex-col justify-between bg-[#0a0a0a]">
-            <div>
-              <Layers className="w-6 h-6 text-liquid-cyan mb-4" />
-              <h3 className="text-xl font-bold mb-4">Especialidades</h3>
-              <ul className="space-y-4 text-sm text-gray-400">
-                <li className="flex items-center gap-2">
-                   <span className="w-1 h-1 bg-cyan-400 rounded-full"/> UI/UX Design
-                </li>
-                <li className="flex items-center gap-2">
-                   <span className="w-1 h-1 bg-cyan-400 rounded-full"/> Swift Development
-                </li>
-                <li className="flex items-center gap-2">
-                   <span className="w-1 h-1 bg-cyan-400 rounded-full"/> Web Apps (React)
-                </li>
-              </ul>
-            </div>
-            <button className="w-full py-3 mt-6 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-xs font-bold uppercase tracking-widest">
-              Saber más
-            </button>
-          </Card>
-
-          {/* 6. PROYECTO WEB */}
-          <Card className="group cursor-pointer hover:bg-white/[0.02] transition-colors">
-            <Globe className="w-6 h-6 text-purple-400 mb-4" />
-            <h3 className="font-bold text-lg">Web Project</h3>
-            <div className="text-xs text-purple-400 flex items-center gap-1 mt-2">
-              Ver demo <ArrowUpRight size={12}/>
-            </div>
-          </Card>
-
-          {/* 7. DEMO REEL - Estilo vídeo */}
-          <Card className="group cursor-pointer flex items-center justify-center bg-black overflow-hidden" noHover>
-             <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity">
-                <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover" alt="Video thumb"/>
-             </div>
-             <div className="relative z-10 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform">
-               <Play className="w-4 h-4 fill-white text-white ml-0.5" />
-             </div>
-             <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-tighter text-white/50">Showreel 2025</span>
-          </Card>
-
-          {/* 8. REDES - Botones más grandes en móvil */}
-          <Card className="md:col-span-1 flex flex-row md:flex-col justify-center gap-6 md:gap-4 bg-gradient-to-br from-white/[0.03] to-transparent">
-              <a 
-                href="https://instagram.com/bypaco.es" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 text-gray-400 hover:text-pink-500 transition-colors"
-              >
-                <Instagram size={22}/>
-                <span className="hidden md:block text-xs font-medium">Instagram</span>
+          {/* 3. LLAMADA A LA ACCIÓN - Único contacto */}
+          <motion.div {...hoverAnimation}>
+            <Card className="h-full flex flex-col justify-center gap-3 bg-cyan-500/10 border border-cyan-500/30 p-6 group cursor-pointer">
+              <MessageSquare className="w-6 h-6 text-cyan-400" />
+              <h3 className="font-bold text-sm text-white tracking-tight">¿Tienes una idea?</h3>
+              <a href="mailto:hola@bypaco.com" className="text-[10px] text-cyan-400 font-black uppercase tracking-widest flex items-center gap-2 group-hover:underline">
+                Hablemos ahora <ArrowUpRight size={12}/>
               </a>
-              
-              <a 
-                href="mailto:hola@bypaco.com" 
-                className="flex items-center gap-3 text-gray-400 hover:text-green-500 transition-colors"
-              >
-                <Mail size={22}/>
-                <span className="hidden md:block text-xs font-medium">Email</span>
-              </a>
+            </Card>
+          </motion.div>
 
-              <a 
-                href="https://github.com/pacocarrillo" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors"
-              >
-                <Github size={22}/>
-                <span className="hidden md:block text-xs font-medium">GitHub</span>
+          {/* 4. PROYECTO WEB - JARDINERÍA */}
+          <motion.div className="md:col-span-2 md:row-span-3" {...hoverAnimation}>
+            <Card className="w-full h-full group overflow-hidden border-0 relative bg-[#080808] flex flex-col items-center !p-0 min-h-[580px] md:min-h-0" noHover>
+              <a href="https://jardineriacarrillo.es" target="_blank" rel="noopener noreferrer" className="relative w-full h-full flex flex-col items-center justify-start pt-8 md:pt-12">
+                <div className="relative mx-auto border-gray-900 bg-gray-900 border-[8px] rounded-[3rem] h-[480px] w-[85%] max-w-[230px] shadow-[0_0_60px_rgba(0,0,0,0.6)] transition-all duration-700 group-hover:scale-[1.02] z-10 mb-32">
+                  <div className="rounded-[2.5rem] overflow-hidden w-full h-full bg-black relative">
+                    <video src="/jardineria-scroll.mov" autoPlay loop muted playsInline className="w-full h-full object-cover opacity-95" />
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black via-black/95 to-transparent pt-32 pb-8 px-8 md:pb-12 md:px-12">
+                  <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div className="flex-1 min-w-[180px]">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400">Trabajo Realizado</span>
+                      <h3 className="text-2xl md:text-4xl font-bold text-white tracking-tighter leading-[0.9] mb-2">Web de alta<br/>calidad visual.</h3>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600/20 backdrop-blur-md border border-blue-500/30 rounded-full shadow-lg group-hover:bg-blue-600/40 transition-all">
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest">Ver Web</span>
+                        <ArrowUpRight size={16} className="text-white" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </a>
-          </Card>
+            </Card>
+          </motion.div>
+
+          {/* 5. ESPECIALIDADES */}
+          <motion.div className="md:row-span-2" {...hoverAnimation}>
+            <Card className="h-full flex flex-col justify-between bg-white/[0.02] backdrop-blur-md border border-white/5 p-8 group">
+              <div>
+                <Layers className="w-6 h-6 text-cyan-400 mb-6" />
+                <h3 className="text-xl font-bold mb-6 tracking-tight">Lo que hago</h3>
+                <ul className="space-y-5 text-sm text-gray-400 font-medium">
+                  {["Diseño de Interfaces", "Aplicaciones iPhone", "Páginas Web Modernas"].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.6)]"/> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button className="w-full py-3 mt-6 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all text-[10px] font-black uppercase tracking-widest text-cyan-400">
+                Saber más
+              </button>
+            </Card>
+          </motion.div>
+
+          {/* 6. INFRAESTRUCTURA */}
+          <motion.div {...hoverAnimation}>
+            <Card className="h-full flex flex-col justify-center gap-3 bg-white/[0.02] backdrop-blur-md border border-white/5 p-6">
+              <Monitor className="w-6 h-6 text-green-400" />
+              <h3 className="font-bold text-sm text-white tracking-tight">Puesta en marcha</h3>
+              <p className="text-[10px] text-gray-500 font-medium leading-tight">
+                Me ocupo de la gestión del servidor, el dominio y que todo esté online sin errores.
+              </p>
+            </Card>
+          </motion.div>
+
+          {/* 7. SHOWREEL - KOIN */}
+          <motion.div className="md:col-span-2 md:row-span-3" {...hoverAnimation}>
+            <Card className="w-full h-full group overflow-hidden border-0 relative bg-[#050505] flex items-center justify-center !p-0 min-h-[580px] md:min-h-0" noHover>
+              <div className="absolute inset-0 z-0 overflow-hidden">
+                <motion.img src="/koin-1.jpg" animate={{ y: [0, -15, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-10 -right-10 w-64 rounded-3xl opacity-40 blur-[1px]" />
+                <motion.img src="/koin-2.jpg" animate={{ y: [0, 15, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute -bottom-20 -left-10 w-60 rounded-3xl opacity-40 blur-[1px]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/80 to-[#050505]" />
+              </div>
+              <div className="absolute top-6 right-6 z-30">
+                <div className="flex items-center gap-2.5 px-3.5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full cursor-pointer hover:bg-cyan-500/20 transition-all">
+                  <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center"><Play size={10} className="text-black fill-current ml-0.5" /></div>
+                  <span className="text-[9px] font-black text-white uppercase tracking-widest">Vídeo</span>
+                </div>
+              </div>
+              <div className="relative z-10 flex flex-col items-center gap-8 w-full px-4 text-center">
+                <div className="absolute inset-0 bg-cyan-500/10 blur-[80px] rounded-full animate-pulse -z-10" />
+                <motion.div whileHover={{ scale: 1.05 }} className="relative w-32 h-32 md:w-36 md:h-36 p-1 bg-gradient-to-br from-cyan-500/30 to-transparent rounded-[2.2rem] shadow-2xl overflow-hidden">
+                  <img src="/koin-icon.jpg" className="w-full h-full object-cover rounded-[2rem]" alt="Koin Icon" />
+                </motion.div>
+                <div className="w-full px-4">
+                  <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tighter uppercase mb-4 text-pretty">Koin <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">App</span></h3>
+                  <div className="flex items-center justify-center gap-3 w-full">
+                    <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
+                    <p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-[0.2em] whitespace-nowrap">App Nativa iOS</p>
+                    <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
+                  </div>
+                </div>
+              </div>
+              <div className="absolute bottom-0 inset-x-0 z-20 p-8 bg-black/60 backdrop-blur-xl border-t border-white/5">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                  <p className="text-xs md:text-sm text-gray-400 font-medium text-center md:text-left max-w-xs leading-relaxed italic">Un ejemplo real de cómo diseño y programo aplicaciones financieras para iPhone.</p>
+                  <div className="flex items-center gap-3 px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-full"><span className="text-cyan-400 font-black text-[9px] uppercase tracking-[0.2em]">Cian Neon</span><div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" /></div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* 8. REDES SOCIALES */}
+          <motion.div {...hoverAnimation}>
+            <Card className="h-full flex flex-row md:flex-col justify-center gap-6 md:gap-4 bg-white/[0.02] backdrop-blur-md border border-white/5">
+                {[
+                  { icon: <Instagram size={20}/>, label: "Instagram", color: "hover:text-pink-500", url: "https://instagram.com/bypaco.es" },
+                  { icon: <Mail size={20}/>, label: "Email", color: "hover:text-cyan-400", url: "mailto:hola@bypaco.com" },
+                  { icon: <Github size={20}/>, label: "GitHub", color: "hover:text-white", url: "https://github.com/pacocarrillo" }
+                ].map((social, i) => (
+                  <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 text-gray-400 ${social.color} transition-all hover:scale-110`}>
+                    {social.icon}
+                    <span className="hidden md:block text-[10px] font-black uppercase tracking-widest">{social.label}</span>
+                  </a>
+                ))}
+            </Card>
+          </motion.div>
 
         </div>
       </main>
