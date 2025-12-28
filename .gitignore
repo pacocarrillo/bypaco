@@ -1,30 +1,33 @@
-# Logs
+# Logs y Debug
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-# dist
-dist-ssr
+# Dependencias y temporales
+node_modules/
+dist/
+dist-ssr/
 *.local
 
-# Editor directories and files
+# Archivos del Editor (Mac/VSCode)
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+
+# Ignorar código fuente en el servidor (Seguridad y Limpieza)
 src/
 public/
-node_modules/
-*.json
-*.js
+
+# Ignorar configuraciones que no necesita el navegador
+package.json
+package-lock.json
+vite.config.js
+tailwind.config.js
+postcss.config.js
+eslint.config.js
 README.md
+.gitignore
