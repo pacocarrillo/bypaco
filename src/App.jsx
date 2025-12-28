@@ -1,13 +1,13 @@
 /* MODIFICACIÓN: 28-12-2025
   AUTOR: ByPaco.es
-  CAMBIOS: Eliminación de redundancia en disponibilidad, mensaje de marca enfocado a calidad y puntero optimizado.
+  CAMBIOS: Puntero inteligente que reacciona a botones/enlaces y eliminación de cursor nativo.
 */
 
 import Background from "./components/Background";
 import Card from "./components/Card";
 import Tag from "./components/Tag";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { 
   Github, Mail, Instagram,
   Globe, Play, Layers, ArrowUpRight, 
@@ -15,35 +15,63 @@ import {
 } from "lucide-react"; 
 
 export default function App() {
+  const [isHovering, setIsHovering] = useState(false);
+
   const hoverAnimation = {
     whileHover: { y: -5, transition: { duration: 0.3, ease: "easeOut" } }
   };
 
-  // Puntero personalizado
+  // Lógica del puntero personalizado con suavizado
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 25, stiffness: 700 };
+  const springConfig = { damping: 35, stiffness: 400, mass: 0.5 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
   useEffect(() => {
+    // 1. Forzamos la desaparición del cursor nativo en toda la web
+    const style = document.createElement('style');
+    style.innerHTML = `* { cursor: none !important; }`;
+    document.head.appendChild(style);
+
     const moveCursor = (e) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
+
+      // 2. Detección de elementos clicables para reaccionar
+      const target = e.target;
+      const isClickable = target.closest('a') || 
+                         target.closest('button') || 
+                         window.getComputedStyle(target).cursor === 'pointer';
+      
+      setIsHovering(!!isClickable);
     };
+
     window.addEventListener("mousemove", moveCursor);
-    return () => window.removeEventListener("mousemove", moveCursor);
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      document.head.removeChild(style);
+    };
   }, []);
 
   return (
-    <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30 cursor-none">
+    <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30">
       <Background />
       
-      {/* PUNTERO CIAN */}
+      {/* PUNTERO CIAN INTELIGENTE */}
       <motion.div 
-        className="fixed top-0 left-0 w-4 h-4 bg-cyan-500 rounded-full pointer-events-none z-[9999] mix-blend-screen shadow-[0_0_15px_rgba(6,182,212,0.8)]"
+        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] mix-blend-screen shadow-lg flex items-center justify-center"
+        animate={{
+          width: isHovering ? 50 : 16,
+          height: isHovering ? 50 : 16,
+          backgroundColor: isHovering ? "rgba(6, 182, 212, 0.15)" : "rgb(6, 182, 212)",
+          border: isHovering ? "1.5px solid rgba(6, 182, 212, 0.5)" : "none"
+        }}
         style={{ x: cursorXSpring, y: cursorYSpring, translateX: "-50%", translateY: "-50%" }}
-      />
+      >
+        {/* Punto central de precisión cuando se expande */}
+        {isHovering && <div className="w-1 h-1 bg-white rounded-full" />}
+      </motion.div>
 
       <main className="relative z-10 max-w-6xl mx-auto p-4 md:p-8 pt-10 md:pt-20 pb-20">
         
@@ -58,7 +86,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:auto-rows-[180px]">
           
-          {/* 1. INTRODUCCIÓN - Texto de marca mejorado */}
+          {/* 1. INTRODUCCIÓN */}
           <motion.div className="md:col-span-3 md:row-span-2" {...hoverAnimation}>
             <Card className="w-full h-full flex flex-col justify-between min-h-[250px] md:min-h-0 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10" />
@@ -87,7 +115,7 @@ export default function App() {
             </Card>
           </motion.div>
 
-          {/* 3. LLAMADA A LA ACCIÓN - Único contacto */}
+          {/* 3. CONTACTO */}
           <motion.div {...hoverAnimation}>
             <Card className="h-full flex flex-col justify-center gap-3 bg-cyan-500/10 border border-cyan-500/30 p-6 group cursor-pointer">
               <MessageSquare className="w-6 h-6 text-cyan-400" />
@@ -98,7 +126,7 @@ export default function App() {
             </Card>
           </motion.div>
 
-          {/* 4. PROYECTO WEB - JARDINERÍA */}
+          {/* 4. PROYECTO WEB */}
           <motion.div className="md:col-span-2 md:row-span-3" {...hoverAnimation}>
             <Card className="w-full h-full group overflow-hidden border-0 relative bg-[#080808] flex flex-col items-center !p-0 min-h-[580px] md:min-h-0" noHover>
               <a href="https://jardineriacarrillo.es" target="_blank" rel="noopener noreferrer" className="relative w-full h-full flex flex-col items-center justify-start pt-8 md:pt-12">
@@ -114,7 +142,7 @@ export default function App() {
                       <h3 className="text-2xl md:text-4xl font-bold text-white tracking-tighter leading-[0.9] mb-2">Web de alta<br/>calidad visual.</h3>
                     </div>
                     <div className="flex-shrink-0">
-                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600/20 backdrop-blur-md border border-blue-500/30 rounded-full shadow-lg group-hover:bg-blue-600/40 transition-all">
+                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600/20 backdrop-blur-md border border-blue-500/30 rounded-full shadow-lg transition-all group-hover:bg-blue-600/40">
                         <span className="text-[10px] font-black text-white uppercase tracking-widest">Ver Web</span>
                         <ArrowUpRight size={16} className="text-white" />
                       </div>
