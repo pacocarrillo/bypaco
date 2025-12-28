@@ -1,13 +1,12 @@
 /* MODIFICACIÓN: 28-12-2025
   AUTOR: ByPaco.es
-  CAMBIOS: Eliminación de redundancia en disponibilidad, mensaje de marca enfocado a calidad y puntero optimizado.
+  CAMBIOS: Restauración de versión preferida, eliminación total de lógica de puntero cian y retorno al cursor estándar.
 */
 
 import Background from "./components/Background";
 import Card from "./components/Card";
 import Tag from "./components/Tag";
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect } from "react";
+import { motion } from "framer-motion"; // Solo motion para animaciones de entrada
 import { 
   Github, Mail, Instagram,
   Globe, Play, Layers, ArrowUpRight, 
@@ -19,32 +18,11 @@ export default function App() {
     whileHover: { y: -5, transition: { duration: 0.3, ease: "easeOut" } }
   };
 
-  // Puntero personalizado
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 25, stiffness: 700 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
-
-  useEffect(() => {
-    const moveCursor = (e) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
-    };
-    window.addEventListener("mousemove", moveCursor);
-    return () => window.removeEventListener("mousemove", moveCursor);
-  }, []);
-
   return (
-    <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30 cursor-none">
+    // Se elimina 'cursor-none' para que el puntero del sistema vuelva a ser visible
+    <div className="relative min-h-screen text-white font-sans selection:bg-cyan-500/30">
       <Background />
       
-      {/* PUNTERO CIAN */}
-      <motion.div 
-        className="fixed top-0 left-0 w-4 h-4 bg-cyan-500 rounded-full pointer-events-none z-[9999] mix-blend-screen shadow-[0_0_15px_rgba(6,182,212,0.8)]"
-        style={{ x: cursorXSpring, y: cursorYSpring, translateX: "-50%", translateY: "-50%" }}
-      />
-
       <main className="relative z-10 max-w-6xl mx-auto p-4 md:p-8 pt-10 md:pt-20 pb-20">
         
         <header className="mb-8 md:mb-12">
@@ -58,7 +36,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:auto-rows-[180px]">
           
-          {/* 1. INTRODUCCIÓN - Texto de marca mejorado */}
+          {/* 1. INTRODUCCIÓN */}
           <motion.div className="md:col-span-3 md:row-span-2" {...hoverAnimation}>
             <Card className="w-full h-full flex flex-col justify-between min-h-[250px] md:min-h-0 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10" />
@@ -87,7 +65,7 @@ export default function App() {
             </Card>
           </motion.div>
 
-          {/* 3. LLAMADA A LA ACCIÓN - Único contacto */}
+          {/* 3. LLAMADA A LA ACCIÓN */}
           <motion.div {...hoverAnimation}>
             <Card className="h-full flex flex-col justify-center gap-3 bg-cyan-500/10 border border-cyan-500/30 p-6 group cursor-pointer">
               <MessageSquare className="w-6 h-6 text-cyan-400" />
@@ -156,80 +134,53 @@ export default function App() {
             </Card>
           </motion.div>
 
-          {/* 7. SHOWREEL - KOIN APP (Diseño Balanceado) */}
-<Card className="md:col-span-2 md:row-span-3 group overflow-hidden border-0 relative bg-[#050505] flex items-center justify-center !p-0 min-h-[580px] md:min-h-0" noHover>
-  
-  {/* CAPA DE FONDO */}
-  <div className="absolute inset-0 z-0 overflow-hidden">
-    <motion.img 
-      src="/koin-1.jpg"
-      animate={{ y: [0, -15, 0] }}
-      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute -top-10 -right-10 w-64 rounded-3xl opacity-40 blur-[1px]" 
-    />
-    <motion.img 
-      src="/koin-2.jpg"
-      animate={{ y: [0, 15, 0] }}
-      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      className="absolute -bottom-20 -left-10 w-60 rounded-3xl opacity-40 blur-[1px]"
-    />
-    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/80 to-[#050505]" />
-  </div>
+          {/* 7. SHOWREEL - KOIN APP */}
+          <Card className="md:col-span-2 md:row-span-3 group overflow-hidden border-0 relative bg-[#050505] flex items-center justify-center !p-0 min-h-[580px] md:min-h-0" noHover>
+            <div className="absolute inset-0 z-0 overflow-hidden">
+              <motion.img 
+                src="/koin-1.jpg"
+                animate={{ y: [0, -15, 0] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-10 -right-10 w-64 rounded-3xl opacity-40 blur-[1px]" 
+              />
+              <motion.img 
+                src="/koin-2.jpg"
+                animate={{ y: [0, 15, 0] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute -bottom-20 -left-10 w-60 rounded-3xl opacity-40 blur-[1px]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/80 to-[#050505]" />
+            </div>
 
-  {/* BOTÓN "PÍLDORA" SHOWREEL */}
-  <div className="absolute top-6 right-6 z-30">
-    <div className="flex items-center gap-2.5 px-3.5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full cursor-pointer hover:bg-cyan-500/20 transition-all">
-      <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center">
-        <Play size={10} className="text-black fill-current ml-0.5" />
-      </div>
-      <span className="text-[9px] font-black text-white uppercase tracking-widest">Showreel</span>
-    </div>
-  </div>
+            <div className="absolute top-6 right-6 z-30">
+              <div className="flex items-center gap-2.5 px-3.5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full cursor-pointer hover:bg-cyan-500/20 transition-all">
+                <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center">
+                  <Play size={10} className="text-black fill-current ml-0.5" />
+                </div>
+                <span className="text-[9px] font-black text-white uppercase tracking-widest">Showreel</span>
+              </div>
+            </div>
 
-  {/* CONTENIDO CENTRAL */}
-  <div className="relative z-10 flex flex-col items-center gap-8 w-full px-4">
-    <div className="relative">
-      <div className="absolute inset-0 bg-cyan-500/10 blur-[80px] rounded-full animate-pulse" />
-      <motion.div 
-        whileHover={{ y: -5 }}
-        className="relative w-32 h-32 md:w-36 md:h-36 p-1 bg-gradient-to-br from-cyan-500/30 to-transparent rounded-[2.2rem] shadow-2xl overflow-hidden"
-      >
-        <img 
-          src="/koin-icon.jpg" 
-          className="w-full h-full object-cover rounded-[2rem]" 
-          alt="Koin Icon"
-        />
-      </motion.div>
-    </div>
+            <div className="relative z-10 flex flex-col items-center gap-8 w-full px-4 text-center">
+              <div className="relative w-32 h-32 md:w-36 md:h-36 p-1 bg-gradient-to-br from-cyan-500/30 to-transparent rounded-[2.2rem] shadow-2xl overflow-hidden">
+                <img src="/koin-icon.jpg" className="w-full h-full object-cover rounded-[2rem]" alt="Koin Icon" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 block mb-2">iOS Showcase</span>
+                <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tighter uppercase mb-4">Koin <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">App</span></h3>
+                <p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-[0.2em] whitespace-nowrap">Personal Finance Nativa</p>
+              </div>
+            </div>
 
-    <div className="text-center w-full">
-      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 block mb-2">iOS Showcase</span>
-      <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tighter uppercase mb-4">Koin <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">App</span></h3>
-      
-      {/* Lema optimizado: tracking ligeramente menor para asegurar que quepa sin cortes */}
-      <div className="flex items-center justify-center gap-3 w-full">
-         <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
-         <p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-[0.2em] whitespace-nowrap">
-            Personal Finance Nativa
-         </p>
-         <div className="h-[1px] flex-1 max-w-[40px] bg-white/10" />
-      </div>
-    </div>
-  </div>
-
-  {/* PIE DE TARJETA - Recuperamos el tamaño p-8 y texto descriptivo */}
-  <div className="absolute bottom-0 inset-x-0 z-20 p-8 bg-black/60 backdrop-blur-xl border-t border-white/5">
-    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-      <p className="text-xs md:text-sm text-gray-400 font-medium text-center md:text-left max-w-xs leading-relaxed">
-        Arquitectura nativa en Swift diseñada para ofrecer el control total de tus finanzas con la simplicidad de iOS.
-      </p>
-      <div className="flex items-center gap-3 px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-full">
-        <span className="text-cyan-400 font-black text-[9px] uppercase tracking-[0.2em]">Build 2025</span>
-        <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-      </div>
-    </div>
-  </div>
-</Card>
+            <div className="absolute bottom-0 inset-x-0 z-20 p-8 bg-black/60 backdrop-blur-xl border-t border-white/5">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <p className="text-xs md:text-sm text-gray-400 font-medium text-center md:text-left max-w-xs leading-relaxed italic">
+                  Arquitectura nativa en Swift diseñada para ofrecer el control total de tus finanzas.
+                </p>
+                <div className="flex items-center gap-3 px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-full"><span className="text-cyan-400 font-black text-[9px] uppercase tracking-[0.2em]">Build 2025</span><div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" /></div>
+              </div>
+            </div>
+          </Card>
 
           {/* 8. REDES SOCIALES */}
           <motion.div {...hoverAnimation}>
